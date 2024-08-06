@@ -18,10 +18,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Run test
-        run: echo "Running tests..."
-        exit 1
+        run: |
+          echo "Running tests..."
+          sleep 120 # Sleep for 2 minutes to ensure timeout
+          # exit 1
