@@ -1,1 +1,26 @@
-name: Terraform test call
+name: Test Workflow
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "dev"
+      - "stg"
+      - "uat"
+      - "main"
+    types:
+      - opened
+      - reopened
+      - closed
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Run test
+        run: echo "Running tests..."
