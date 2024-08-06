@@ -1,0 +1,29 @@
+name: Deploy Workflow 2
+
+on:
+  workflow_run:
+    workflows: ["Test Workflow"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Determine if relevant paths were changed
+        id: check_paths
+        run: |
+          # Get the list of changed files
+          changed_files=$(git diff --name-only ${{ github.event.workflow_run.head_sha }} ${{ github.event.workflow_run.base_sha }})
+
+          # Check if any of the changed files match the paths
+          echo "$changed_files" | grep -E '^tf/|^cloud_functions/|^\.github/workflows/terraform_.*\.yml' && echo "paths_changed=true" || echo "paths_changed=false"
+          echo "paths_changed=$(echo "$changed_files" | grep -E '^tf/|^cloud_functions/|^\.github/workflows/terraform_.*\.yml' > /dev/null && echo 'true' || echo 'false')" >> $GITHUB_ENV
+
+      - name: Deploy
+        if: ${{ env.paths_changed == 'true' }}
+        run: echo "Deploying application..."
